@@ -3,4 +3,4 @@ Code implementation of the Spotlight Resonance Method. This is implemented in Nu
 
 - SpotlightResonanceMethod.py contains a function for computing spotlight resonance on a given array.
 
-- Example.pynb contains an example of how to use the Spotlight Resonance Method using a randomly generate numpy array with various anisotropies introduced.
+- Example.ipynb contains an example of how to use the Spotlight Resonance Method using a randomly generate numpy array with various anisotropies introduced.
