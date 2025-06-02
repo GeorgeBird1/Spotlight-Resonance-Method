@@ -19,7 +19,7 @@ def PrivilegedPlaneProjectiveMethod(*,
     :param privileged_basis: These are the set of privileged basis directions for the layer. Numpy array of shape
     [number of privileged basis vectors, dimensionality of layer]
 
-    :param epsilon: This is the epsilon parameter similar to the spotlight resonance method, it effectively is a tolerance which represents a cone angle (phi=arccos epsilon) about the 'probe vector' which counts the amount of activations inside. (-1<epsilon<1)
+    :param epsilon:  Gives a tolerance for the norm of the vector component perpendicular to the plane. In effect, if the original vector is sufficiently close to the plane (small perpendicular component), then it is projected to the plane, if not, discarded. (or alternative method commented out uses the epsilon parameter similar to the spotlight resonance method, it effectively is a tolerance which represents a cone angle (phi=arccos epsilon) about the 'probe vector' which counts the amount of activations inside. (-1<epsilon<1))
 
     :param max_planes: There is a quadratic growth in privileged bivectors with each new privileged vector. This sets an upper limit on the number of bivectors considered (drawn randomly). If set to None, then it uses all bivectors.
 
@@ -70,20 +70,28 @@ def PrivilegedPlaneProjectiveMethod(*,
         ehat1 = normalise(privileged_basis[indices[0], :], axis=0)
         ehat2 = normalise(privileged_basis[indices[1], :], axis=0)
 
-        # Find the component of the activations which is along each basis vector
-        activation_component1 = np.einsum("i, ji->j", ehat1, latent_layer_activations)
-        activation_component2 = np.einsum("i, ji->j", ehat2, latent_layer_activations)
+        # Requires the pseudo inverse of the plane's basis vectors to determine the scaling of each basis component
+        E = np.array([ehat1, ehat2])
+        pseudo_inverse = E.T @ np.linalg.inv(E @ E.T)
+
+        # Determine components
+        components = latent_layer_activations @ pseudo_inverse
 
         # Calculate the vector within the plane of interest.
-        in_plane_vector = np.einsum("j, k->jk", activation_component1, ehat1) + np.einsum("j, k->jk", activation_component2, ehat2)
+        in_plane_vector = np.einsum("se, ed->sd", components, E)
 
         # Calculate the angle between the plane and the original vector
         angle_to_plane = np.arccos(np.linalg.norm(in_plane_vector, axis=1)/np.linalg.norm(latent_layer_activations, axis=1))
 
         # If that angle is within phi then add then add the inplane vector to the stack of projected points
-        within_angle = angle_to_plane<=phi
-        components_projected = np.array([activation_component1[within_angle], activation_component2[within_angle]]).T
-        projected_points = np.vstack([projected_points, components_projected])
+        # within_angle = angle_to_plane<=phi
+
+        # Alternative method, using a cutoff on the length of the perpendicular component instead of angle.
+        plane_perpendicular_vector_norm = np.linalg.norm(latent_layer_activations-in_plane_vector, axis=1)
+        within_tolerance = plane_perpendicular_vector_norm < epsilon
+       
+        # Stack the components within the plane
+        projected_points = np.vstack([projected_points, components[within_tolerance, :]])
         
     return projected_points
 
