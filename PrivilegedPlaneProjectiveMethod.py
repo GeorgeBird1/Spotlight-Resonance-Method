@@ -40,7 +40,7 @@ def PrivilegedPlaneProjectiveMethod(*,
 
     # Calculate angle phi
     phi = np.arccos(epsilon)
-
+    print(f"{phi=:.4}")
     # Then produces all valid privileged bivectors
     if verbose: print("Calculating Bivectors... ", end="")
     if perm_or_comb.upper() == "PERM":
@@ -72,7 +72,10 @@ def PrivilegedPlaneProjectiveMethod(*,
 
         # Requires the pseudo inverse of the plane's basis vectors to determine the scaling of each basis component
         E = np.array([ehat1, ehat2])
-        pseudo_inverse = E.T @ np.linalg.inv(E @ E.T)
+        try:
+            pseudo_inverse = E.T @ np.linalg.inv(E @ E.T)
+        except:
+            continue
 
         # Determine components
         components = latent_layer_activations @ pseudo_inverse
@@ -84,14 +87,14 @@ def PrivilegedPlaneProjectiveMethod(*,
         angle_to_plane = np.arccos(np.linalg.norm(in_plane_vector, axis=1)/np.linalg.norm(latent_layer_activations, axis=1))
 
         # If that angle is within phi then add then add the inplane vector to the stack of projected points
-        # within_angle = angle_to_plane<=phi
-
+        within_angle = angle_to_plane<=phi
+        
         # Alternative method, using a cutoff on the length of the perpendicular component instead of angle.
-        plane_perpendicular_vector_norm = np.linalg.norm(latent_layer_activations-in_plane_vector, axis=1)
-        within_tolerance = plane_perpendicular_vector_norm < epsilon
+        # plane_perpendicular_vector_norm = np.linalg.norm(latent_layer_activations-in_plane_vector, axis=1)
+        # within_tolerance = plane_perpendicular_vector_norm < epsilon
        
         # Stack the components within the plane
-        projected_points = np.vstack([projected_points, components[within_tolerance, :]])
+        projected_points = np.vstack([projected_points, components[within_angle, :]])
         
     return projected_points
 
