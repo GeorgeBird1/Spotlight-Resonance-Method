@@ -19,7 +19,7 @@ def PrivilegedPlaneProjectiveMethod(*,
     :param privileged_basis: These are the set of privileged basis directions for the layer. Numpy array of shape
     [number of privileged basis vectors, dimensionality of layer]
 
-    :param epsilon:  Gives a tolerance for the norm of the vector component perpendicular to the plane. In effect, if the original vector is sufficiently close to the plane (small perpendicular component), then it is projected to the plane, if not, discarded. (or alternative method commented out uses the epsilon parameter similar to the spotlight resonance method, it effectively is a tolerance which represents a cone angle (phi=arccos epsilon) about the 'probe vector' which counts the amount of activations inside. (-1<epsilon<1))
+    :param epsilon: Uses the epsilon parameter similar to the spotlight resonance method, it effectively is a tolerance which represents a cone angle (phi=arccos epsilon) about the 'probe vector' which counts the amount of activations inside. (-1<epsilon<1)).  (or alternative method commented out  Gives a tolerance for the norm of the vector component perpendicular to the plane. In effect, if the original vector is sufficiently close to the plane (small perpendicular component), then it is projected to the plane, if not,discarded.)
 
     :param max_planes: There is a quadratic growth in privileged bivectors with each new privileged vector. This sets an upper limit on the number of bivectors considered (drawn randomly). If set to None, then it uses all bivectors.
 
