@@ -71,8 +71,11 @@ def PrivilegedPlaneProjectiveMethod(*,
         ehat2 = normalise(privileged_basis[indices[1], :], axis=0)
 
         # Requires the pseudo inverse of the plane's basis vectors to determine the scaling of each basis component
-        E = np.array([ehat1, ehat2])
         try:
+            # Find ehat2_prime which is perpendicular to ehat1 and has a positive dot product with ehat2
+            dot = np.einsum("i, i->", ehat1, ehat2)
+            ehat2_prime = (ehat2-dot*ehat1)/np.sqrt(1-dot*dot)
+            E = np.array([ehat1, ehat2_prime])
             pseudo_inverse = E.T @ np.linalg.inv(E @ E.T)
         except:
             continue
