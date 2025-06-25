@@ -7,7 +7,7 @@ Code implementation of the Spotlight Resonance Method. This is implemented in Nu
 
 
 Since the original publication, a futher method has been developed "Privileged Plane Projective Method" (PPPM) which is similar to SRM in function, but provides the actual activations within the plane rather than an angular density. This method may be preferable if complicated distributions of activations make the SRM method difficult to interpret --- in which case PPPM can be used by the developer to interpret the activation distributions by eye.
-[I'VE REALISED THERE IS A PROBLEM WITH THE CODE FOR NON-STANDARD BASES RIGHT NOW, THIS WILL SHORTLY BE FIXED, PLEASE DON'T USE UNTIL RESOLVED!]
+[A bug with how non-standard bases were displayed should be now corrected]
 
 The following two files contain the code and an example:
 
