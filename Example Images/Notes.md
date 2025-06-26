@@ -2,20 +2,15 @@
 
 There are 6 files so far, all displayed using the Privileged Plane Projective Method. 
 [TITLE, AUTOENCODER SIZE, EXTRINSIC DIMENSION OF BOTTLENECK, THOMPSON BASIS VECTORS, EPSILON]
-- MNIST Small 16 17 epsilon=0.9
-- MNIST Small 16 32 epsilon=0.9
-- MNIST Small 16 64 epsilon=0.9
-- MNIST Large 16 17 epsilon=0.9
-- MNIST Large 16 32 epsilon=0.9
-- MNIST Large 16 64 epsilon=0.9
+- MNIST Small 16 17 epsilon=0.85
+- MNIST Small 16 32 epsilon=0.85
+- MNIST Small 16 64 epsilon=0.85
+- MNIST Large 16 17 epsilon=0.85
+- MNIST Large 16 32 epsilon=0.85
+- MNIST Large 16 64 epsilon=0.85
 
 These are then shown as a series of plots, starting with initialisations in the two leftmost columns then progressing the following columns shows how the representations shift throughout training. Each column is an additional +number amount of epochs trained compared to the previous. (bacth size 24 and computed over training set)
-[init, init, +1, +1, +1, +1, +2, +2, +2, +5, +5, +5, +5, +10, +10, +10, +10, +10, +10, +10]
-
-Interpretations:
-
-
-
+[init, init, +2, +2, +2, +2, +2, +2, +2, +2, +2, +2, +5, +5, +10, +10, +10, +10, +10, +10, +10]
 
 I have chosen to display this as a density plot as opposed to a scatter, though either would suffice. This is then displayed using matplotlib imshow. It is also normalised, since the anti-aligned angles can cover more volume they could have greater density. Therefore, I used a random normal to approximate how an *isotropic* **representation** distribution would appear, and divided by this to act as a volume normaliser.
 
