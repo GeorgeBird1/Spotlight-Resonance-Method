@@ -3,13 +3,13 @@ import itertools
 
 
 def PrivilegedPlaneProjectiveMethod(*,
-                                    latent_layer_activations: np.array,
-                                    privileged_basis: np.array,
-                                    epsilon: float = 0.9,
-                                    max_planes: int = None,
-                                    perm_or_comb: str = "PERM",
-                                    verbose: bool = False,
-                                    ):
+                               latent_layer_activations: np.array,
+                               privileged_basis: np.array,
+                               epsilon: float = 0.9,
+                               max_planes: int = None,
+                               perm_or_comb: str = "PERM",
+                               verbose: bool = False,
+                               ):
     """
     Performs the Privileged Plane Projective Method method on the activations provided. Activations within the specified angle are projected onto the plane. There in-plane coordinates are then outputted for the user to analyse.
 
@@ -31,11 +31,9 @@ def PrivilegedPlaneProjectiveMethod(*,
     """
 
     # Basic checks
-    if perm_or_comb.upper() not in ["PERM", "COMB"]: raise ValueError(
-        f"Please ensure \"PERM\" or \"COMB\" SRM is selected, not {perm_or_comb=}.")
-    if epsilon > 1 or epsilon < -1: raise ValueError(f"Please ensure \"epsilon\" is in range [-1, 1] not {epsilon=}.")
-    if privileged_basis.shape[1] != latent_layer_activations.shape[1]: raise ValueError(
-        "Privileged basis invalid, must be same dimensionality as the activations provided!")
+    if perm_or_comb.upper() not in ["PERM", "COMB"]: raise ValueError(f"Please ensure \"PERM\" or \"COMB\" SRM is selected, not {perm_or_comb=}.")
+    if epsilon>1 or epsilon<-1: raise ValueError(f"Please ensure \"epsilon\" is in range [-1, 1] not {epsilon=}.")
+    if privileged_basis.shape[1] != latent_layer_activations.shape[1]: raise ValueError("Privileged basis invalid, must be same dimensionality as the activations provided!")
 
     # Indexes privileged vectors
     basis_indices = list(range(privileged_basis.shape[0]))
@@ -53,8 +51,7 @@ def PrivilegedPlaneProjectiveMethod(*,
 
     if max_planes is not None:
         if max_planes < len(valid_plane_indices):
-            print(
-                f"Total planes={len(valid_plane_indices)} but only a random sample of {max_planes} will be calculated.")
+            print(f"Total planes={len(valid_plane_indices)} but only a random sample of {max_planes} will be calculated.")
         else:
             print(f"All {len(valid_plane_indices)} will be calculated.")
         valid_plane_indices = valid_plane_indices[:max_planes]
@@ -64,7 +61,7 @@ def PrivilegedPlaneProjectiveMethod(*,
 
     # Iterate over the various planes to compute projected bivector values
     for p, indices in enumerate(valid_plane_indices):
-        if verbose: print(f"Calculating plane {p + 1} of {len(valid_plane_indices)}.")
+        if verbose: print(f"Calculating plane {p+1} of {len(valid_plane_indices)}.")
 
         # Find the two (unit) basis vectors defining the plane
         ehat1 = normalise(privileged_basis[indices[0], :], axis=0)
@@ -74,9 +71,10 @@ def PrivilegedPlaneProjectiveMethod(*,
         try:
             # Find ehat2_prime which is perpendicular to ehat1 and has a positive dot product with ehat2
             dot = np.einsum("i, i->", ehat1, ehat2)
-            ehat2_prime = normalise(ehat2 - dot * ehat1, axis=0)
+            ehat2_prime = normalise(ehat2-dot*ehat1, axis=0)
             E = np.array([ehat1, ehat2_prime])
             pseudo_inverse = E.T @ np.linalg.inv(E @ E.T)
+            # print(pseudo_inverse)
         except:
             if verbose: print("Parallel - Skipped!")
             continue
@@ -87,18 +85,18 @@ def PrivilegedPlaneProjectiveMethod(*,
         in_plane_vector = np.einsum("se, ed->sd", components, E)
 
         # Calculate the angle between the plane and the original vector
-        angle_to_plane = np.linalg.norm(in_plane_vector, axis=1) / np.linalg.norm(latent_layer_activations, axis=1)
+        angle_to_plane = np.linalg.norm(in_plane_vector, axis=1)/np.linalg.norm(latent_layer_activations, axis=1)
 
         # If that angle is within phi then add then add the inplane vector to the stack of projected points
-        within_angle = angle_to_plane >= epsilon
-
+        within_angle = angle_to_plane>=epsilon
+        
         # Alternative method, using a cutoff on the length of the perpendicular component instead of angle.
         # plane_perpendicular_vector_norm = np.linalg.norm(latent_layer_activations-in_plane_vector, axis=1)
         # within_tolerance = plane_perpendicular_vector_norm < epsilon
-
+       
         # Stack the components within the plane
         projected_points = np.vstack([projected_points, components[within_angle, :]])
-
+        
     return projected_points
 
 
